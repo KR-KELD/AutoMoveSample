@@ -7,10 +7,9 @@
 
 PlayerController에서 특정 Pawn을 빙의하는 중에 AIController 서브 컨트롤러로 사용해 Behavior Tree를 사용할 수 있게 구현하였습니다.
 
-1. PlayerController를 사용하고 있기 때문에 플레이어의 인풋에 반응합니다.
-2. 독자적으로 연결된 AIController를 사용해 Behavior Tree를 실행시켜 자동이동을 실행합니다.
-3. 자동이동 TaskNode가 실행중일 때 남은 이동 경로를 표시해줍니다.
-4. 자동이동중 플레이어 인풋을 감지하면 자동이동을 정지합니다.
+1. 독자적으로 연결된 AIController를 사용해 Behavior Tree를 실행시켜 자동이동을 실행합니다.
+2. 자동이동 TaskNode가 실행중일 때 남은 이동 경로를 표시해줍니다.
+3. 자동이동중 플레이어 인풋을 감지하면 자동이동을 정지합니다.
 
 ## 설치 및 실행 방법
 1. 프로젝트를 클론합니다.
