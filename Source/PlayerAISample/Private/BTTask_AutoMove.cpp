@@ -17,6 +17,7 @@ UBTTask_AutoMove::UBTTask_AutoMove(const FObjectInitializer& ObjectInitializer)
 
 	bNotifyTaskFinished = true;
 	bNotifyTick = true;
+	DrawPath = true;
 }
 
 EBTNodeResult::Type UBTTask_AutoMove::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -130,8 +131,40 @@ void UBTTask_AutoMove::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMe
 		return;
 	}
 
+	if (DrawPath)
+	{
+		DrawPathSphere(AIController, DeltaSeconds);
+	}
+
+	FVector MoveVector = MyMemory->PrevOwnerLocation - Owner->GetActorLocation();
+	float MoveAmount = MoveVector.Size();
+
+	if (MoveAmount < 5.0f)
+	{
+		MyMemory->StopMoveRimitTime -= DeltaSeconds;
+		if (MyMemory->StopMoveRimitTime < 0.0f)
+		{
+			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+			return;
+		}
+	}
+	else
+	{
+		MyMemory->StopMoveRimitTime = StopRimitTime;
+	}
+	MyMemory->PrevOwnerLocation = Owner->GetActorLocation();
+}
+
+void UBTTask_AutoMove::DrawPathSphere(AAIController* InAIController, float DeltaSeconds)
+{
+	ACharacter* Owner = InAIController->GetPawn<ACharacter>();
+	if (!IsValid(Owner))
+	{
+		return;
+	}
+
 	// 자동이동 경로 표시
-	UPathFollowingComponent* PathFollowingComp = AIController->GetPathFollowingComponent();
+	UPathFollowingComponent* PathFollowingComp = InAIController->GetPathFollowingComponent();
 	if (IsValid(PathFollowingComp))
 	{
 		if (PathFollowingComp->GetPath().IsValid())
@@ -139,7 +172,7 @@ void UBTTask_AutoMove::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMe
 			TArray<FNavPathPoint>& PathPoints = PathFollowingComp->GetPath()->GetPathPoints();
 			int32 CurrentPathIndex = PathFollowingComp->GetCurrentPathIndex();
 			float BetweenDistance = 100.0f;
-		
+
 			for (int32 Path = CurrentPathIndex; Path < PathPoints.Num() - 1; Path++)
 			{
 				FVector PointA = PathPoints[Path].Location;
@@ -160,24 +193,6 @@ void UBTTask_AutoMove::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMe
 		}
 
 	}
-
-	FVector MoveVector = MyMemory->PrevOwnerLocation - Owner->GetActorLocation();
-	float MoveAmount = MoveVector.Size();
-
-	if (MoveAmount < 5.0f)
-	{
-		MyMemory->StopMoveRimitTime -= DeltaSeconds;
-		if (MyMemory->StopMoveRimitTime < 0.0f)
-		{
-			FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
-			return;
-		}
-	}
-	else
-	{
-		MyMemory->StopMoveRimitTime = StopRimitTime;
-	}
-	MyMemory->PrevOwnerLocation = Owner->GetActorLocation();
 }
 
 uint16 UBTTask_AutoMove::GetInstanceMemorySize() const

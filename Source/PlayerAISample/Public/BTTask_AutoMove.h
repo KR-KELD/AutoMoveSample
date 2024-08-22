@@ -6,6 +6,8 @@
 #include "BehaviorTree/BTTaskNode.h"
 #include "BTTask_AutoMove.generated.h"
 
+class AAIController;
+
 struct FBTAutoMoveToTaskMemory
 {
 	FAIRequestID MoveRequestID;
@@ -28,6 +30,8 @@ public:
 	virtual void OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTNodeResult::Type TaskResult) override;
 	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 
+	void DrawPathSphere(AAIController* InAIController, float DeltaSeconds);
+
 	virtual uint16 GetInstanceMemorySize() const override;
 private:
 	EBTNodeResult::Type PerformMoveTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory);
@@ -36,4 +40,8 @@ private:
 	// 한 자리에 n초 이상 머무르면 AutoMove 종료
 	UPROPERTY(EditAnywhere, Category = "Auto Move", DisplayName = "Stop Rimit Time")
 	float StopRimitTime;
+
+	UPROPERTY(EditAnywhere, Category = "Auto Move", DisplayName = "Draw Path")
+	bool DrawPath;
+
 };
